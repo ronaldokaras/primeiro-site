@@ -11,48 +11,39 @@
 }
 
 :root {
-    /* Fundos — areia clara e azul-céu suave */
     --bg: #f0f9ff;
     --bg-elevated: #ffffff;
     --bg-card: #ffffff;
     --bg-muted: #e0f2fe;
     --bg-hover: #dbeafe;
 
-    /* Bordas */
     --border: rgba(14, 116, 168, 0.12);
     --border-strong: rgba(14, 116, 168, 0.28);
 
-    /* Texto */
     --text: #0c2b45;
     --text-secondary: #3b6c8f;
     --text-muted: #6a94b3;
     --text-placeholder: #a3c1d6;
 
-    /* Azul oceano — primário */
     --primary: #0ea5e9;
     --primary-hover: #0284c7;
     --primary-soft: rgba(14, 165, 233, 0.12);
     --primary-border: rgba(14, 165, 233, 0.35);
 
-    /* Azul marinho profundo */
     --deep: #075985;
     --deep-soft: rgba(7, 89, 133, 0.12);
 
-    /* Amarelo sol — destaque */
     --sun: #fbbf24;
     --sun-hover: #f59e0b;
     --sun-soft: rgba(251, 191, 36, 0.18);
     --sun-border: rgba(251, 191, 36, 0.5);
 
-    /* Turquesa — acento */
     --teal: #14b8a6;
     --teal-soft: rgba(20, 184, 166, 0.12);
 
-    /* Coral — acento quente */
     --coral: #fb7185;
     --coral-soft: rgba(251, 113, 133, 0.12);
 
-    /* Estados */
     --success: #10b981;
     --success-bg: #ecfdf5;
     --success-border: #a7f3d0;
@@ -85,6 +76,7 @@ body {
     color: var(--text);
     background: var(--bg);
     min-height: 100vh;
+    min-height: 100dvh; /* ✅ FIX: evita "salto" em mobile */
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
@@ -93,7 +85,7 @@ body {
 
 ::selection {
     background: rgba(14, 165, 233, 0.28);
-    color: #0c2b45;
+    color: var(--text);
 }
 
 :focus-visible {
@@ -101,22 +93,13 @@ body {
     outline-offset: 2px;
 }
 
-::-webkit-scrollbar {
-    width: 8px;
-}
-
-::-webkit-scrollbar-track {
-    background: transparent;
-}
-
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
     background: #bae6fd;
     border-radius: 99px;
 }
-
-::-webkit-scrollbar-thumb:hover {
-    background: #7dd3fc;
-}
+::-webkit-scrollbar-thumb:hover { background: #7dd3fc; }
 
 /* ==========================================================
    AUTH PAGE — céu + sol + mar
@@ -128,6 +111,7 @@ body {
     justify-content: center;
     padding: 32px 16px;
     min-height: 100vh;
+    min-height: 100dvh; /* ✅ FIX */
     position: relative;
     background:
         radial-gradient(ellipse 45% 35% at 88% 8%, rgba(251, 191, 36, 0.45), transparent 60%),
@@ -144,8 +128,11 @@ body {
     width: 280px;
     height: 280px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(251, 191, 36, 0.6), rgba(251, 191, 36, 0.15) 45%, transparent 72%);
-    filter: blur(8px);
+    /* ✅ FIX: gradiente sem filter:blur (mesmo visual, muito mais barato) */
+    background: radial-gradient(circle,
+        rgba(251, 191, 36, 0.6) 0%,
+        rgba(251, 191, 36, 0.15) 45%,
+        transparent 72%);
     pointer-events: none;
     z-index: 0;
 }
@@ -159,7 +146,6 @@ body {
     height: 380px;
     border-radius: 50% 50% 0 0 / 40% 40% 0 0;
     background: linear-gradient(180deg, rgba(14, 165, 233, 0.22), rgba(7, 89, 133, 0.35));
-    filter: blur(2px);
     pointer-events: none;
     z-index: 0;
 }
@@ -179,7 +165,9 @@ body {
     padding: 40px 36px 36px;
     box-shadow: var(--shadow-lg);
     animation: cardIn 0.5s var(--ease);
-    overflow: hidden;
+    /* ✅ FIX: removido overflow:hidden — ele cortava o focus ring
+       dos inputs e podia clipar o alerta animado.
+       A barra de gradiente agora cuida do próprio arredondamento. */
 }
 
 .card-auth::before {
@@ -189,12 +177,23 @@ body {
     left: 0;
     right: 0;
     height: 4px;
+    /* ✅ FIX: aplica raio só nas pontas superiores */
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
     background: linear-gradient(90deg, var(--primary) 0%, var(--teal) 50%, var(--sun) 100%);
+    pointer-events: none;
 }
 
 @keyframes cardIn {
     from { opacity: 0; transform: translateY(16px); }
     to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ✅ NEW: animação própria pra alertas — só fade.
+   Antes usava `cardIn` (que translada) e isso fazia o alerta
+   parecer "sair do lugar" dentro do card em alguns navegadores. */
+@keyframes alertIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
 }
 
 /* ==========================================================
@@ -225,7 +224,7 @@ body {
 .cabecalho-auth h1 {
     font-size: clamp(22px, 4vw, 26px);
     font-weight: 700;
-    letter-spacing: -0.03em;
+    letter-spacing: -0.02em;
     line-height: 1.2;
     margin-bottom: 8px;
     color: var(--deep);
@@ -253,6 +252,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: 7px;
+    min-width: 0; /* ✅ NEW: evita estouro em flex */
 }
 
 .campo label {
@@ -279,7 +279,7 @@ body {
 
 .input-wrapper input {
     width: 100%;
-    padding: 12px 42px 12px 42px;
+    padding: 12px 48px 12px 42px; /* ✅ FIX: mais espaço p/ botão */
     background: var(--bg-muted);
     border: 1.5px solid transparent;
     border-radius: var(--radius-md);
@@ -289,18 +289,17 @@ body {
     line-height: 1.4;
     transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
     outline: none;
+    min-width: 0; /* ✅ NEW */
 }
 
 .input-wrapper input::placeholder {
     color: var(--text-placeholder);
 }
 
-.input-wrapper:hover .icone {
-    opacity: 0.9;
-}
+.input-wrapper:hover .icone { opacity: 0.9; }
 
-.input-wrapper input:hover {
-    background: #cfe9fb;
+@media (hover: hover) {
+    .input-wrapper input:hover { background: #cfe9fb; }
 }
 
 .input-wrapper input:focus {
@@ -309,11 +308,17 @@ body {
     box-shadow: var(--focus-ring);
 }
 
-.input-wrapper:focus-within .icone {
-    opacity: 1;
+/* ✅ FIX: input com foco não dispara mais o outline global (ficava duplo anel) */
+.input-wrapper input:focus-visible {
+    outline: none;
 }
 
-.input-wrapper input:user-invalid:not(:placeholder-shown) {
+.input-wrapper:focus-within .icone { opacity: 1; }
+
+/* ✅ FIX: funciona com ou sem placeholder e com aria-invalid do JS */
+.input-wrapper input:user-invalid:not(:placeholder-shown),
+.input-wrapper input:invalid:not(:placeholder-shown),
+.input-wrapper input[aria-invalid="true"] {
     border-color: var(--danger);
     box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
 }
@@ -326,6 +331,8 @@ body {
 .btn-toggle-senha {
     position: absolute;
     right: 8px;
+    top: 50%;             /* ✅ FIX: centraliza verticalmente */
+    transform: translateY(-50%);
     background: none;
     border: none;
     cursor: pointer;
@@ -334,6 +341,7 @@ body {
     padding: 8px;
     border-radius: 6px;
     transition: opacity 0.15s ease, background 0.15s ease;
+    line-height: 1;
 }
 
 .btn-toggle-senha:hover {
@@ -365,10 +373,12 @@ body {
     box-shadow: 0 8px 18px rgba(14, 165, 233, 0.35);
 }
 
-.btn-primario:hover {
-    transform: translateY(-1px);
-    background-position: 100% 50%;
-    box-shadow: 0 12px 26px rgba(7, 89, 133, 0.42);
+@media (hover: hover) {
+    .btn-primario:hover {
+        transform: translateY(-1px);
+        background-position: 100% 50%;
+        box-shadow: 0 12px 26px rgba(7, 89, 133, 0.42);
+    }
 }
 
 .btn-primario:active {
@@ -412,30 +422,75 @@ body {
 }
 
 /* ==========================================================
-   ALERTS
+   ALERTS  — ✅ REESCRITO
    ========================================================== */
 
 .alerta {
+    /* ✅ FIX: layout previsível, texto longo quebra, não estoura a lateral */
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
     padding: 12px 14px;
     border-radius: var(--radius-sm);
     font-size: 13.5px;
-    margin-bottom: 18px;
     text-align: left;
     font-weight: 500;
     line-height: 1.45;
-    animation: cardIn 0.35s var(--ease);
+    border: 1px solid transparent; /* reserva espaço p/ variantes */
+
+    /* ✅ FIX: nunca deixa estourar horizontalmente quando o erro é longo */
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    min-width: 0;
+    max-width: 100%;
+
+    /* ✅ FIX: em pais flex, o alerta não encolhe nem estica errado */
+    flex-shrink: 0;
+
+    /* ✅ FIX: garante que a animação não cause “pulo” visual */
+    animation: alertIn 0.25s var(--ease);
+    will-change: opacity;
+}
+
+/* ✅ FIX: quando o alerta é filho de .form-auth (que tem gap),
+   evita o espaçamento duplo (gap + margin). Se for irmão do form,
+   mantém a margem para separar. */
+.form-auth > .alerta {
+    margin-bottom: 0;
+}
+
+.form-auth + .alerta,
+.alerta + .form-auth {
+    margin-bottom: 18px;
+}
+
+/* Ícone opcional dentro do alerta */
+.alerta::before {
+    content: '';
+    flex: 0 0 4px;
+    align-self: stretch;
+    border-radius: 99px;
+    background: currentColor;
+    opacity: 0.35;
 }
 
 .alerta-erro {
     background: var(--danger-bg);
     color: var(--danger-text);
-    border: 1px solid var(--danger-border);
+    border-color: var(--danger-border);
 }
 
 .alerta-sucesso {
     background: var(--success-bg);
     color: var(--success-text);
-    border: 1px solid var(--success-border);
+    border-color: var(--success-border);
+}
+
+/* ✅ NEW: variante de aviso (usa o amarelo sol que já existia nos tokens) */
+.alerta-aviso {
+    background: var(--sun-soft);
+    color: #92400e;
+    border-color: var(--sun-border);
 }
 
 /* ==========================================================
@@ -449,16 +504,23 @@ body {
         radial-gradient(ellipse 40% 25% at 80% 90%, rgba(20, 184, 166, 0.1), transparent 55%),
         linear-gradient(180deg, #e0f2fe 0%, #f0f9ff 60%, #fef3c7 100%);
     min-height: 100vh;
+    min-height: 100dvh; /* ✅ FIX */
 }
 
 .topbar {
     position: sticky;
     top: 0;
     z-index: 10;
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background: rgba(255, 255, 255, 0.92); /* ✅ FIX: fallback caso backdrop-filter falhe */
     border-bottom: 1px solid var(--border);
+}
+
+@supports (backdrop-filter: blur(12px)) or (-webkit-backdrop-filter: blur(12px)) {
+    .topbar {
+        background: rgba(255, 255, 255, 0.85);
+        -webkit-backdrop-filter: blur(12px);
+        backdrop-filter: blur(12px);
+    }
 }
 
 .topbar-conteudo {
@@ -481,9 +543,7 @@ body {
     color: var(--deep);
 }
 
-.logo-topbar {
-    font-size: 20px;
-}
+.logo-topbar { font-size: 20px; }
 
 .topbar-usuario {
     display: flex;
@@ -491,11 +551,17 @@ body {
     gap: 14px;
     font-size: 14px;
     color: var(--text-secondary);
+    min-width: 0; /* ✅ NEW */
 }
 
 .topbar-usuario strong {
     color: var(--primary-hover);
     font-weight: 700;
+    /* ✅ NEW: trunca nomes longos sem quebrar a topbar */
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .btn-sair {
@@ -535,7 +601,7 @@ body {
     padding: 32px;
     box-shadow: var(--shadow-md);
     animation: cardIn 0.5s var(--ease);
-    overflow: hidden;
+    /* ✅ FIX: overflow:hidden removido (mesmo motivo do card-auth) */
 }
 
 .card-dashboard::before {
@@ -545,7 +611,9 @@ body {
     left: 0;
     right: 0;
     height: 4px;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0; /* ✅ FIX */
     background: linear-gradient(90deg, var(--primary) 0%, var(--teal) 50%, var(--sun) 100%);
+    pointer-events: none;
 }
 
 /* ==========================================================
@@ -558,9 +626,7 @@ body {
         border-radius: 16px;
     }
 
-    .cabecalho-auth h1 {
-        font-size: 22px;
-    }
+    .cabecalho-auth h1 { font-size: 22px; }
 
     .logo-auth {
         width: 50px;
@@ -569,17 +635,11 @@ body {
         border-radius: 14px;
     }
 
-    .topbar-usuario span {
-        display: none;
-    }
+    .topbar-usuario span { display: none; }
 
-    .conteudo-principal {
-        padding: 28px 16px;
-    }
+    .conteudo-principal { padding: 28px 16px; }
 
-    .card-dashboard {
-        padding: 24px 20px;
-    }
+    .card-dashboard { padding: 24px 20px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -590,5 +650,167 @@ body {
         animation-iteration-count: 1 !important;
         transition-duration: 0.001ms !important;
         scroll-behavior: auto !important;
+    }
+}
+
+/* ==========================================================
+   LISTA DE USUÁRIOS — itens e ações
+   ========================================================== */
+
+.lista-vazia {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 14px;
+    padding: 24px 0;
+}
+
+.lista-usuarios {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+}
+
+.item-usuario {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    background: var(--bg-muted);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+    min-width: 0;
+}
+
+@media (hover: hover) {
+    .item-usuario:hover {
+        background: var(--bg-hover);
+        border-color: var(--border-strong);
+        transform: translateY(-1px);
+    }
+}
+
+.item-usuario-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    flex: 1;
+}
+
+.item-usuario-info strong {
+    font-size: 14.5px;
+    font-weight: 650;
+    color: var(--deep);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.item-usuario-info span {
+    font-size: 13px;
+    color: var(--text-secondary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.badge-eu {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--primary-hover);
+    background: var(--primary-soft);
+    padding: 2px 8px;
+    border-radius: 99px;
+    flex-shrink: 0;
+}
+
+/* ---------- Ações ---------- */
+
+.item-usuario-acoes {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.btn-acao {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    background: #ffffff;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 15px;
+    line-height: 1;
+    text-decoration: none;
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease, color 0.15s ease;
+    color: var(--text-secondary);
+}
+
+@media (hover: hover) {
+    .btn-editar:hover {
+        background: var(--primary-soft);
+        border-color: var(--primary-border);
+        transform: translateY(-1px);
+    }
+
+    .btn-deletar:hover {
+        background: var(--danger-bg);
+        border-color: var(--danger-border);
+        transform: translateY(-1px);
+    }
+}
+
+.btn-acao:active {
+    transform: translateY(0) scale(0.96);
+}
+
+.btn-acao:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+.btn-deletar {
+    color: var(--danger);
+}
+
+.btn-desabilitado {
+    opacity: 0.35;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.form-deletar {
+    display: inline-flex;
+    margin: 0;
+    padding: 0;
+}
+
+/* ---------- Responsivo: empilha botões ---------- */
+
+@media (max-width: 480px) {
+    .item-usuario {
+        flex-wrap: wrap;
+    }
+
+    .item-usuario-info {
+        flex-basis: calc(100% - 34px);
+    }
+
+    .item-usuario-acoes {
+        margin-left: auto;
     }
 }

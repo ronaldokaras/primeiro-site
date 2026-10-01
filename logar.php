@@ -2,34 +2,52 @@
 session_start();
 require_once 'conexao.php';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = trim($_POST['email']);
-    $senha = $_POST['senha'];
-
-    if (!empty($email) && !empty($senha)) {
-        // Busca o usuário pelo e-mail
-        $sql = "SELECT * FROM tb_usuarios WHERE email = :email";
-        $stmt = $conexao->prepare($sql);
-        $stmt->bindParam(':email', $email);
-        $stmt->execute();
-
-        $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        // Se encontrou o usuário e a senha está correta
-        if ($usuario && password_verify($senha, $usuario['senha'])) {
-            // Guarda dados do usuário na Sessão
-            $_SESSION['usuario_id'] = $usuario['id']; // Ou a coluna ID do seu banco
-            $_SESSION['usuario_nome'] = $usuario['nome'];
-
-            // Redireciona para a página restrita de cadastro
-            header('Location: cadastro.php');
-            exit();
-        } else {
-            echo "E-mail ou senha incorretos!";
-            echo "<br><a href='login.html'>Tentar novamente</a>";
-        }
-    } else {
-        echo "Preencha todos os campos.";
-    }
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header('Location: login.php');
+    exit();
 }
-?>
+
+$email = trim($_POST['email'] ?? '');
+$senha = $_POST['senha'] ?? '';
+
+// Guarda o e-mail pra repor no form em caso de erro
+$_SESSION['flash_email'] = $email;
+
+if ($email === '' || $senha === '') {
+    $_SESSION['flash_erro'] = 'Preencha todos os campos.';
+    header('Location: login.php');
+    exit();
+}
+
+try {
+    $sql  = "SELECT id, nome, senha FROM tb_usuarios WHERE email = :email LIMIT 1";
+    $stmt = $conexao->prepare($sql);
+    $stmt->bindParam(':email', $email);
+    $stmt->execute();
+    $usuario = $stmt->fetch();
+
+    if ($usuario && password_verify($senha, $usuario['senha'])) {
+
+        // ✅ Evita session fixation
+        session_regenerate_id(true);
+
+        $_SESSION['usuario_id']   = (int) $usuario['id'];
+        $_SESSION['usuario_nome'] = $usuario['nome'];
+
+        unset($_SESSION['flash_erro'], $_SESSION['flash_email']);
+
+        header('Location: cadastro.php');
+        exit();
+    }
+
+    // Mensagem genérica: não revela se o e-mail existe
+    $_SESSION['flash_erro'] = 'E-mail ou senha incorretos.';
+    header('Location: login.php');
+    exit();
+
+} catch (PDOException $e) {
+    error_log('Erro login: ' . $e->getMessage());
+    $_SESSION['flash_erro'] = 'Erro interno. Tente novamente.';
+    header('Location: login.php');
+    exit();
+}

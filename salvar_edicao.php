@@ -12,12 +12,21 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 
-// CSRF
-$token = $_POST['csrf_token'] ?? '';
-if (empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $token)) {
-    $_SESSION['flash_erro'] = 'Sessão expirada. Tente novamente.';
+// ✅ Helper local (precisa vir ANTES do CSRF, pois é usado nele)
+function voltarComErro(string $msg, int $id = 0): void {
+    $_SESSION['flash_erro'] = $msg;
+    if ($id > 0) {
+        // ✅ Sinaliza que o modal Editar deve reabrir
+        $_SESSION['flash_editar_id'] = $id;
+    }
     header('Location: cadastro.php');
     exit();
+}
+
+// ✅ Valida CSRF
+$token = $_POST['csrf_token'] ?? '';
+if (empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $token)) {
+    voltarComErro('Sessão expirada. Tente novamente.');
 }
 
 $id              = (int) ($_POST['id'] ?? 0);
@@ -26,19 +35,11 @@ $email           = trim($_POST['email'] ?? '');
 $senha           = $_POST['senha'] ?? '';
 $confirmar_senha = $_POST['confirmar_senha'] ?? '';
 
-// Guarda pra repopular em caso de erro
+// Guarda pra repopular o modal
 $_SESSION['flash_form'] = ['nome' => $nome, 'email' => $email];
 
-function voltarComErro(string $msg, int $id): void {
-    $_SESSION['flash_erro'] = $msg;
-    header("Location: editar.php?id=$id");
-    exit();
-}
-
 if ($id <= 0) {
-    $_SESSION['flash_erro'] = 'Usuário inválido.';
-    header('Location: cadastro.php');
-    exit();
+    voltarComErro('Usuário inválido.');
 }
 
 if ($nome === '' || $email === '') {
@@ -66,9 +67,7 @@ try {
     $check->bindParam(':id', $id, PDO::PARAM_INT);
     $check->execute();
     if (!$check->fetch()) {
-        $_SESSION['flash_erro'] = 'Usuário não encontrado.';
-        header('Location: cadastro.php');
-        exit();
+        voltarComErro('Usuário não encontrado.');
     }
 
     // Verifica e-mail duplicado (outro usuário)

@@ -2,7 +2,6 @@
 session_start();
 require_once 'conexao.php';
 
-// 🔒 Exige login (antes disso qualquer um podia POSTar direto)
 if (empty($_SESSION['usuario_id'])) {
     header('Location: login.php');
     exit();
@@ -13,6 +12,19 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 
+/** Helper local para encerrar com flash de erro */
+function voltarComErro(string $msg): void {
+    $_SESSION['flash_erro'] = $msg;
+    header('Location: cadastro.php');
+    exit();
+}
+
+// ✅ Valida CSRF PRIMEIRO
+$token = $_POST['csrf_token'] ?? '';
+if (empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $token)) {
+    voltarComErro('Sessão expirada. Tente novamente.');
+}
+
 $nome            = trim($_POST['nome'] ?? '');
 $email           = trim($_POST['email'] ?? '');
 $senha           = $_POST['senha'] ?? '';
@@ -20,13 +32,6 @@ $confirmar_senha = $_POST['confirmar_senha'] ?? '';
 
 // Guarda para repopular
 $_SESSION['flash_form'] = ['nome' => $nome, 'email' => $email];
-
-/** Helper local para encerrar com flash de erro */
-function voltarComErro(string $msg): void {
-    $_SESSION['flash_erro'] = $msg;
-    header('Location: cadastro.php');
-    exit();
-}
 
 // 1) Campos obrigatórios
 if ($nome === '' || $email === '' || $senha === '' || $confirmar_senha === '') {
@@ -49,7 +54,6 @@ if (strlen($senha) < 6) {
 }
 
 try {
-    // 5) Checa duplicidade ANTES de inserir (mensagem mais clara)
     $check = $conexao->prepare("SELECT id FROM tb_usuarios WHERE email = :email LIMIT 1");
     $check->bindParam(':email', $email);
     $check->execute();
@@ -58,7 +62,6 @@ try {
         voltarComErro('Este e-mail já está cadastrado.');
     }
 
-    // 6) Insere
     $senhaHash = password_hash($senha, PASSWORD_DEFAULT);
 
     $sql  = "INSERT INTO tb_usuarios (nome, email, senha) VALUES (:nome, :email, :senha)";
@@ -68,14 +71,12 @@ try {
     $stmt->bindParam(':senha', $senhaHash);
     $stmt->execute();
 
-    // Sucesso — limpa repopulação e mostra mensagem
     unset($_SESSION['flash_form']);
     $_SESSION['flash_sucesso'] = 'Cadastro realizado com sucesso!';
     header('Location: cadastro.php');
     exit();
 
 } catch (PDOException $e) {
-    // Corrida: dois POSTs simultâneos com mesmo e-mail
     if ($e->getCode() === '23000') {
         voltarComErro('Este e-mail já está cadastrado.');
     }

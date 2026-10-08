@@ -814,3 +814,478 @@ body {
         margin-left: auto;
     }
 }
+
+/* ==========================================================
+   NAV SECUNDÁRIA (abaixo da topbar)
+   ========================================================== */
+
+.nav-secundaria {
+    background: rgba(255, 255, 255, 0.7);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 57px; /* altura da topbar */
+    z-index: 9;
+}
+
+.nav-secundaria-conteudo {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    gap: 4px;
+}
+
+.nav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 14px 16px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    border-bottom: 2px solid transparent;
+    transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+    margin-bottom: -1px;
+}
+
+.nav-link:hover {
+    color: var(--deep);
+    background: var(--primary-soft);
+}
+
+.nav-link.ativo {
+    color: var(--primary-hover);
+    border-bottom-color: var(--primary);
+}
+
+/* ==========================================================
+   LAYOUT GERAL DO CONTEÚDO
+   ========================================================== */
+
+.conteudo-principal.conteudo-largo {
+    max-width: 1100px;
+    padding: 32px 24px;
+}
+
+.cabecalho-pagina {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+.cabecalho-pagina h1 {
+    font-size: clamp(22px, 3vw, 28px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--deep);
+    margin: 0 0 4px;
+}
+
+.cabecalho-pagina p {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.card-dashboard-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.card-dashboard-header h2 {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--deep);
+    margin: 0;
+}
+
+/* ==========================================================
+   CARDS DE ESTATÍSTICA (home.php)
+   ========================================================== */
+
+.grid-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+}
+
+.card-stat {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 20px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+@media (hover: hover) {
+    .card-stat:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+}
+
+.card-stat-icone {
+    width: 48px;
+    height: 48px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--primary-soft), var(--teal-soft));
+    color: var(--primary-hover);
+    flex-shrink: 0;
+}
+
+.card-stat-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.card-stat-label {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.card-stat-valor {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--deep);
+    letter-spacing: -0.02em;
+}
+
+/* ==========================================================
+   TABELA DE USUÁRIOS
+   ========================================================== */
+
+.tabela-wrapper {
+    overflow-x: auto;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+}
+
+.tabela {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    background: #fff;
+}
+
+.tabela thead th {
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 650;
+    font-size: 12.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    background: var(--bg-muted);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+}
+
+.tabela tbody td {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    vertical-align: middle;
+}
+
+.tabela tbody tr:last-child td {
+    border-bottom: none;
+}
+
+@media (hover: hover) {
+    .tabela tbody tr:hover td {
+        background: var(--bg-muted);
+    }
+}
+
+.col-id     { color: var(--text-muted); font-weight: 600; font-variant-numeric: tabular-nums; }
+.col-email  { color: var(--text-secondary); }
+.col-acoes  { text-align: right; white-space: nowrap; }
+
+.tabela-vazia {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 32px 16px !important;
+}
+
+/* ==========================================================
+   BOTÕES DE AÇÃO (tabela)
+   ========================================================== */
+
+.btn-acao {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    background: #ffffff;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 15px;
+    line-height: 1;
+    text-decoration: none;
+    color: var(--text-secondary);
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+
+@media (hover: hover) {
+    .btn-editar:hover {
+        background: var(--primary-soft);
+        border-color: var(--primary-border);
+        transform: translateY(-1px);
+    }
+    .btn-deletar:hover {
+        background: var(--danger-bg);
+        border-color: var(--danger-border);
+        transform: translateY(-1px);
+    }
+}
+
+.btn-acao:active { transform: translateY(0) scale(0.96); }
+.btn-acao:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+.btn-deletar { color: var(--danger); }
+.btn-desabilitado { opacity: 0.35; cursor: not-allowed; pointer-events: none; }
+
+.form-deletar { display: inline-flex; margin: 0; padding: 0; }
+
+/* ==========================================================
+   BOTÕES GENÉRICOS
+   ========================================================== */
+
+.btn-primario.btn-auto,
+.btn-secundario {
+    width: auto;
+    padding: 10px 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.15s ease, box-shadow 0.2s ease;
+    border: 1.5px solid transparent;
+}
+
+.btn-secundario {
+    background: #fff;
+    border-color: var(--border-strong);
+    color: var(--text-secondary);
+}
+
+@media (hover: hover) {
+    .btn-secundario:hover {
+        background: var(--primary-soft);
+        border-color: var(--primary-border);
+        color: var(--primary-hover);
+    }
+}
+
+.btn-primario.btn-auto {
+    width: auto;
+    margin-top: 0;
+}
+
+/* ==========================================================
+   MODAIS
+   ========================================================== */
+
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(12, 43, 69, 0.45);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    padding: 24px 16px;
+    overflow-y: auto;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.modal.aberto {
+    display: flex;
+    animation: modalFade 0.2s var(--ease);
+}
+
+@keyframes modalFade {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+.modal-content {
+    position: relative;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 28px;
+    width: 100%;
+    max-width: 440px;
+    margin: 40px auto;
+    box-shadow: var(--shadow-lg);
+    animation: modalIn 0.3s var(--ease);
+}
+
+@keyframes modalIn {
+    from { opacity: 0; transform: translateY(-12px) scale(0.98); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.modal-content::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    background: linear-gradient(90deg, var(--primary) 0%, var(--teal) 50%, var(--sun) 100%);
+}
+
+.modal-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 22px;
+    line-height: 1;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.modal-close:hover {
+    background: var(--danger-bg);
+    color: var(--danger-text);
+}
+
+.modal-header {
+    margin-bottom: 20px;
+    padding-right: 32px;
+}
+
+.modal-header h2 {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--deep);
+    margin: 0 0 4px;
+}
+
+.modal-header p {
+    font-size: 13.5px;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.modal-acoes {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 8px;
+}
+
+/* ==========================================================
+   BADGE / LISTA VAZIA
+   ========================================================== */
+
+.badge-eu {
+    display: inline-block;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--primary-hover);
+    background: var(--primary-soft);
+    padding: 2px 8px;
+    border-radius: 99px;
+    margin-left: 6px;
+    vertical-align: middle;
+}
+
+.lista-vazia {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 14px;
+    padding: 20px 0;
+}
+
+/* ==========================================================
+   TOPBAR — pulse verde
+   ========================================================== */
+
+.topbar-pulse {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #22ff88;
+    margin-left: 4px;
+    box-shadow: 0 0 10px #22ff88, 0 0 20px #22ff88;
+    animation: pulseLogo 2s ease-in-out infinite;
+}
+
+@keyframes pulseLogo {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%      { opacity: 0.5; transform: scale(0.85); }
+}
+
+/* ==========================================================
+   RESPONSIVO
+   ========================================================== */
+
+@media (max-width: 640px) {
+    .conteudo-principal.conteudo-largo {
+        padding: 20px 16px;
+    }
+
+    .cabecalho-pagina {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .cabecalho-pagina .btn-primario.btn-auto {
+        width: 100%;
+    }
+
+    .col-id, .col-email {
+        display: none;
+    }
+
+    .nav-secundaria { top: 0; }
+    .nav-secundaria-conteudo { padding: 0 12px; overflow-x: auto; }
+
+    .modal-content { padding: 24px 20px; margin: 16px auto; }
+}
